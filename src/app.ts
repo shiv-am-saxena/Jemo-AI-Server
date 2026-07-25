@@ -5,8 +5,27 @@ import { apiResponse } from './utils/apiResponse';
 import authRouter from './routes/auth.route';
 import session from 'express-session';
 import passport from './services/passport';
+import morgan from 'morgan';
+import logger from './services/logger';
 const app = express();
 
+const morganFormat = ':method :url :status :response-time ms';
+
+app.use(
+	morgan(morganFormat, {
+		stream: {
+			write: (message) => {
+				const logObject = {
+					method: message.split(' ')[0],
+					url: message.split(' ')[1],
+					status: message.split(' ')[2],
+					responseTime: message.split(' ')[3]
+				};
+				logger.info(JSON.stringify(logObject));
+			}
+		}
+	})
+);
 app.use(
 	cors({
 		origin: process.env.CORS_ORIGIN,
@@ -16,6 +35,8 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET as string,
@@ -49,4 +70,5 @@ app.get('/', (req: Request, res: Response) => {
 	);
 });
 app.use('/auth', authRouter);
+
 export { app };
