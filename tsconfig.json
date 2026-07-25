@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ESNext",
+		"moduleResolution": "bundler",
+		"lib": ["ESNext", "DOM"],
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"typeRoots": ["./node_modules/@types", "./src/types/*"]
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules"]
+}
