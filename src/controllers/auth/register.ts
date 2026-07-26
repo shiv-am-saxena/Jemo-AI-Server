@@ -7,6 +7,7 @@ import { sendVerificationEmail } from '../../services/nodemailer';
 import { apiResponse } from '../../utils/apiResponse';
 import { jwtPayload } from '../../types/jwtPayload';
 import { Request, Response, NextFunction } from 'express'; // Added NextFunction
+import bcrypt from 'bcryptjs';
 
 const register = asyncHandler(async (req: Request, res: Response) => {
 	const { name, email, password } = req.body;
@@ -15,8 +16,8 @@ const register = asyncHandler(async (req: Request, res: Response) => {
 	if (existingUser) {
 		throw new ApiError(400, 'User already exists');
 	}
-
-	const user = await User.create({ name, email, password });
+	const hashedPassword = await bcrypt.hash(password, 12);
+	const user = await User.create({ name, email, password:hashedPassword });
 
 	const token = jwt.sign(
 		{ id: user._id, email: user.email },
@@ -41,48 +42,54 @@ const register = asyncHandler(async (req: Request, res: Response) => {
 			)
 		);
 });
-
 const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
-	const { token } = req.query;
+	// FIX 1: Extract token correctly from req.query
+	const token = req.query.token as string;
 
 	if (!token || typeof token !== 'string') {
 		throw new ApiError(400, 'Verification token is required');
 	}
 
 	const decoded = jwt.verify(token, process.env.JWT_SECRET!) as jwtPayload;
+
 	if (!decoded) {
-		throw new ApiError(400, 'Invalid verification token');
+		res
+			.status(400)
+			.redirect(`${process.env.CLIENT_URL}/verify-email?success=false`);
 	}
 
 	// FIX 1: Access 'id', not '_id', based on how it was signed
+
 	const userId = decoded.id;
+
 	const user = await User.findById(userId);
 
 	if (!user) {
-		throw new ApiError(404, 'User not found');
+		res
+
+			.status(404)
+			.redirect(`${process.env.CLIENT_URL}/verify-email?success=false`);
 	}
 
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
+
 		{ isVerified: true },
+
 		{ returnDocument: 'after' }
 	);
+
 	if (!updatedUser) {
-		throw new ApiError(500, 'Failed to verify user');
+		res
+
+			.status(500)
+			.redirect(`${process.env.CLIENT_URL}/verify-email?success=false`);
 	}
 
 	res
-		.status(200)
-		.json(
-			new apiResponse(
-				200,
-				{ user: updatedUser._id },
-				'Email verified successfully'
-			)
-		);
+	.status(200)
+	.redirect(`${process.env.CLIENT_URL}/verify-email?success=true`)
 });
-
-// FIX 2 & 3: Remove asyncHandler, add next(), use next(err) and res.redirect()
 const registerWithGoogle = (
 	req: Request,
 	res: Response,

@@ -15,7 +15,7 @@ export const isLoggedIn = asyncHandler(async (req: Request, res: Response, next:
     if (!decodedToken) {
         throw new ApiError(401, "Unauthorized");
     }
-    const user = await User.findById(decodedToken.id);
+    const user = await User.findById(decodedToken.id).select("-createdAt -updatedAt");
     if (!user) {
         throw new ApiError(401, "Unauthorized");
     }

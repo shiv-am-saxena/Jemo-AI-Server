@@ -63,10 +63,20 @@ passport.use('github', new GitHubStrategy(
     async (accessToken: string, refreshToken: string, profile: any, done: Function) => {
         try {
             // Check if user exists
-            let user = await User.findOne({ email: profile.emails?.[0].value });
+            let user = await User.findOne({ email: profile.emails?.[0].value }).select("+githubId");
 
             if (user) {
-                // 1. User exists -> Log them in
+				// If the user exists but doesn't have a GitHub ID, update it
+				if (!user.githubId) {
+					user.githubId = profile.id;
+					const success = await user.save();
+					if (!success) {
+						return done(null, false, {
+							message: 'Failed to update user with GitHub ID.'
+						});
+					}
+					return done(null, user);
+				}
                 return done(null, user);
             }
 
@@ -117,7 +127,11 @@ passport.use(
 					googleId: profile.id,
 					isVerified: true
 				});
-				await user.save();
+				user = await user.save();
+				if(!user)
+					return done(null, false, {
+						message: 'Failed to create user.'
+					});
 				return done(null, user);
 			} catch (error) {
 				return done(error);

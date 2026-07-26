@@ -26,8 +26,8 @@ export const sendVerificationEmail = async (
 	verificationToken: string
 ): Promise<boolean> => {
 	try {
-		const baseUrl = process.env.CLIENT_URL as string;
-		const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
+		const baseUrl = process.env.BASE_URL as string;
+		const verificationUrl = `${baseUrl}/auth/verify-email?token=${verificationToken}`;
 
 		// Use Mail.Options to strictly type the email configuration
 		const mailOptions: Mail.Options = {

@@ -9,7 +9,6 @@ interface User extends Document {
     isVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
-    comparePassword: (password: string) => Promise<boolean>;
 }
 
 export default User;

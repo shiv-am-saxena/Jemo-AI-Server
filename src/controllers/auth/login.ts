@@ -5,6 +5,7 @@ import passport from "../../services/passport";
 import { NextFunction, Request, Response } from "express";
 import User from "../../models/user.model";
 import { apiResponse } from "../../utils/apiResponse";
+import bcrypt from "bcryptjs";
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -14,16 +15,21 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         throw new ApiError(400, "Email and password are required");
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     // Check if the password is correct
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password as string);
+    
     if (!isMatch) {
         throw new ApiError(401, "Invalid credentials");
+    }
+
+    if (!user.isVerified) {
+        throw new ApiError(403, "Email not verified. Please verify your email before logging in.");
     }
 
     // Generate JWT token
@@ -101,7 +107,7 @@ export const handleGoogleAuthCallback = (
 			);
 
 			// Redirect back to frontend with the token
-			res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
+            res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
 		}
 	)(req, res, next);
 };
