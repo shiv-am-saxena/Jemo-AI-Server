@@ -23,7 +23,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
     // Check if the password is correct
     const isMatch = await bcrypt.compare(password, user.password as string);
-    
+
     if (!isMatch) {
         throw new ApiError(401, "Invalid credentials");
     }
@@ -41,7 +41,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         }
     );
 
-    res.status(200).json(new apiResponse(200, { token, user }, "Login successful"));
+    res.status(200).json(new apiResponse(200, { token, user }, "Login successful")).cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Set to true in production
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
 });
 
 export const handleGithubAuthCallback = asyncHandler(async (req:Request, res:Response, next:NextFunction) => {
