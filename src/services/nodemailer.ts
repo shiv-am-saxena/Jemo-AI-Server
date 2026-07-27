@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
+import logger from './logger';
 
 // 1. Configure the transporter
 // We cast the env variables as strings to satisfy TypeScript's strict mode
@@ -14,9 +15,9 @@ export const transporter = nodemailer.createTransport({
 // 2. Verify the connection on startup
 transporter.verify((error: Error | null, success: true) => {
 	if (error) {
-		console.error('Error connecting to email service:', error);
+		logger.error('Error connecting to email service:', error);
 	} else {
-		console.log('Email service is ready to send messages');
+		logger.info('Email service is ready to send messages');
 	}
 });
 

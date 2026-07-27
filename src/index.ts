@@ -3,17 +3,22 @@ dotenv.config();
 import connectDb from './db/mongooseConnection';
 import { app } from './app';
 import errorHandler from './middlewares/errorHandler';
+import http  from 'http';
+import { initSocket } from './socket/socket';
+import logger from './services/logger';
 
 const port = process.env.PORT || 8080;
+const httpServer = http.createServer(app);
 
+initSocket(httpServer);
 connectDb()
 	.then(() => {
-		app.listen(port, () => {
-			console.log(`Server is running at port ${port}`);
+		httpServer.listen(port, () => {
+			logger.info(`Server is running at port ${port}`);
 		});
 	})
 	.catch((err) => {
-		console.log(`Connection to the database failed due to ${err}`);
+		logger.error(`Connection to the database failed due to ${err}`);
 	});
 
 app.use(errorHandler);
