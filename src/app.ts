@@ -7,6 +7,9 @@ import session from 'express-session';
 import passport from './services/passport';
 import morgan from 'morgan';
 import logger from './services/logger';
+import cronRouter from './jobs/storageCleanup';
+import chatsRouter from './routes/chats.route';
+
 const app = express();
 
 const morganFormat = ':method :url :status :response-time ms';
@@ -70,5 +73,6 @@ app.get('/', (req: Request, res: Response) => {
 	);
 });
 app.use('/auth', authRouter);
-
+app.use('/chats', chatsRouter);
+app.use('/crons', cronRouter); // Add this line to include the cron routes
 export { app };

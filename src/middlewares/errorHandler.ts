@@ -1,6 +1,6 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import { ApiError } from '../utils/ApiError';
-import { Request } from '../types/Request';
+
 
 const errorHandler = (
 	err: ApiError,

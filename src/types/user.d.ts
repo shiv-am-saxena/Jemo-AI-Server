@@ -1,6 +1,7 @@
-import Document from 'mongoose';
+import Document, { ObjectId } from 'mongoose';
 
-interface User extends Document {
+interface IUser extends Document {
+    _id: ObjectId;
     name: string;
     email: string;
     password?: string;
@@ -11,4 +12,4 @@ interface User extends Document {
     updatedAt: Date;
 }
 
-export default User;
+export default IUser;
