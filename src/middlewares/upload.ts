@@ -11,21 +11,11 @@ const flexibleFileFilter = (
 ) => {
 	const mimeType = file.mimetype;
 
-	const isImage = mimeType.startsWith('image/');
 	const isText = mimeType.startsWith('text/');
 
 	// 2. Safelist standard Document and Data MIME types
 	const allowedAppMimes = [
 		'application/pdf',
-		'application/msword', // .doc
-		'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-		'application/vnd.ms-excel', // .xls
-		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-		'application/rtf',
-		'application/json',
-		'application/xml',
-		'application/javascript',
-		'application/typescript'
 	];
 	const isAllowedDoc = allowedAppMimes.includes(mimeType);
 
@@ -62,7 +52,7 @@ const flexibleFileFilter = (
 	const isCodeExtension = codeAndTextExtensions.includes(fileExtension);
 
 	// 4. Final Validation
-	if (isImage || isText || isAllowedDoc || isCodeExtension) {
+	if (isText || isAllowedDoc || isCodeExtension) {
 		if (
 			fileExtension === '.exe' ||
 			fileExtension === '.bat' ||
@@ -77,7 +67,7 @@ const flexibleFileFilter = (
 	return cb(
 		new ApiError(
 			400,
-			`Unsupported file type: ${file.originalname}. Only images, documents, and text/code files are permitted.`
+			`Unsupported file type: ${file.originalname}. Only documents, and text/code files are permitted.`
 		)
 	);
 };
@@ -87,7 +77,6 @@ export const uploadFiles = multer({
     storage,
     limits: {
         fileSize: 50 * 1024 * 1024,
-        files: 10
     },
     fileFilter: flexibleFileFilter
-}).array('documents', 10);
+}).single('file');

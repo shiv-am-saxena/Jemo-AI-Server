@@ -9,7 +9,7 @@ import logger from './services/logger';
 
 const port = process.env.PORT || 8080;
 const httpServer = http.createServer(app);
-
+httpServer.setTimeout(1000000); // Set timeout to 5 minutes (in milliseconds)
 initSocket(httpServer);
 connectDb()
 	.then(() => {

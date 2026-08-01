@@ -6,7 +6,11 @@ interface IMessage extends Document {
     direction: "inbound" | "outbound";
     content: {
         text: string,
-        media?: string[]
+        media?: {
+            url: string;
+            imagekitId: string;
+            fileType: string;
+        }[]
     };
     aiModel: string;
     createdAt: Date;

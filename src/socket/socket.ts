@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { ApiError } from '../utils/ApiError';
 import logger from '../services/logger';
+import { registerChatHandlers } from './chatSocket';
 
 let io: Server;
 
@@ -14,7 +15,7 @@ export function initSocket(server: any): void {
     logger.info('Socket.io initialized');
     io.on('connection', (socket) => {
         console.log('A user connected');
-
+        registerChatHandlers(io, socket);
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });

@@ -17,7 +17,15 @@ const messageSchema = new mongoose.Schema<IMessage>({
             required: true,
         },
         media: [{
-            type: String,
+            url: {
+                type: String,
+            },
+            imagekitId: {
+                type: String,
+            },
+            fileType: {
+                type: String,
+            },
         }],
     },
     aiModel: {

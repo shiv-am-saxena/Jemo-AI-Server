@@ -22,7 +22,7 @@ cronRouter.post(
 		// 2. Delete each media from ImageKit and then remove the record from the database
 		for (const record of mediaRecords) {
 			try {
-				// Note: The correct ImageKit method is deleteFile(), not delete()
+
 				await client.delete(record.fileId);
 
 				// 3. Delete the record from your database after ImageKit confirms deletion
