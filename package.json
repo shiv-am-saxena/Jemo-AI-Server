@@ -6,7 +6,8 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "tsx --watch src/index.ts",
-		"build": "tsc"
+		"build": "tsc",
+		"start": "tsx src/index.ts"
 	},
 	"devDependencies": {
 		"@types/cookie-parser": "^1.4.10",
