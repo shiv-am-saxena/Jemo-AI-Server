@@ -76,7 +76,8 @@ const flexibleFileFilter = (
 export const uploadFiles = multer({
     storage,
     limits: {
-        fileSize: 50 * 1024 * 1024,
+		fileSize: 50 * 1024 * 1024,
+		files: 10
     },
     fileFilter: flexibleFileFilter
-}).single('file');
+}).array('files', 10); // Accept up to 10 files with the field name 'files'
